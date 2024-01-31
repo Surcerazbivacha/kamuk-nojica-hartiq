@@ -1,0 +1,138 @@
+using System;
+
+// Интерфейс за обектите, които могат да бъдат използвани в играта
+public interface IPlayable
+{
+    string Name { get; }
+    bool Beats(IPlayable opponent);
+}
+
+// Абстрактен клас за реализация на обектите в играта
+public abstract class PlayableObject : IPlayable
+{
+    public string Name { get; protected set; }
+
+    public abstract bool Beats(IPlayable opponent);
+}
+
+// Клас за камък
+public class Rock : PlayableObject
+{
+    public Rock()
+    {
+        Name = "Камък";
+    }
+
+    public override bool Beats(IPlayable opponent)
+    {
+        return opponent.GetType() == typeof(Scissors);
+    }
+}
+
+// Клас за ножици
+public class Scissors : PlayableObject
+{
+    public Scissors()
+    {
+        Name = "Ножици";
+    }
+
+    public override bool Beats(IPlayable opponent)
+    {
+        return opponent.GetType() == typeof(Paper);
+    }
+}
+
+// Клас за хартия
+public class Paper : PlayableObject
+{
+    public Paper()
+    {
+        Name = "Хартия";
+    }
+
+    public override bool Beats(IPlayable opponent)
+    {
+        return opponent.GetType() == typeof(Rock);
+    }
+}
+
+// Клас, който контролира играта
+public class Game
+{
+    private PlayableObject GetRandomObject()
+    {
+        Random random = new Random();
+        int choice = random.Next(0, 3);
+        switch (choice)
+        {
+            case 0:
+                return new Rock();
+            case 1:
+                return new Scissors();
+            case 2:
+                return new Paper();
+            default:
+                return null;
+        }
+    }
+
+    public void Play()
+    {
+        PlayableObject playerChoice;
+        while (true)
+        {
+            Console.WriteLine("Изберете: 1 - Камък, 2 - Ножици, 3 - Хартия, 0 - Изход");
+            int choice = Convert.ToInt32(Console.ReadLine());
+
+            if (choice == 0)
+            {
+                Console.WriteLine("Играта приключи.");
+                break;
+            }
+
+            if (choice < 1 || choice > 3)
+            {
+                Console.WriteLine("Невалиден избор. Моля, опитайте отново.");
+                continue;
+            }
+
+            switch (choice)
+            {
+                case 1:
+                    playerChoice = new Rock();
+                    break;
+                case 2:
+                    playerChoice = new Scissors();
+                    break;
+                case 3:
+                    playerChoice = new Paper();
+                    break;
+                default:
+                    playerChoice = null;
+                    break;
+            }
+
+            PlayableObject computerChoice = GetRandomObject();
+
+            Console.WriteLine($"Вие избрахте: {playerChoice.Name}");
+            Console.WriteLine($"Компютърът избра: {computerChoice.Name}");
+
+            if (playerChoice.Beats(computerChoice))
+                Console.WriteLine("Вие печелите!");
+            else if (computerChoice.Beats(playerChoice))
+                Console.WriteLine("Компютърът печели!");
+            else
+                Console.WriteLine("Равенство!");
+        }
+    }
+}
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        Game game = new Game();
+        game.Play();
+    }
+}
